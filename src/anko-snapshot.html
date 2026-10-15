@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style id="anko-boot-style">
+        #anko-boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bg-dark,#060a0d);transition:opacity .25s ease,visibility .25s ease}
+        html.anko-boot-skip #anko-boot,#anko-boot.done{opacity:0;visibility:hidden;pointer-events:none}
+        #anko-boot .card{--bg-color:#111;background-color:var(--bg-color);padding:1rem 2rem;border-radius:1.25rem}
+        #anko-boot .loader{color:#7c7c7c;font-family:Montserrat,system-ui,sans-serif;font-weight:500;font-size:25px;box-sizing:content-box;height:40px;padding:10px;display:flex;border-radius:8px}
+        #anko-boot .loader p{margin:0;padding:0;line-height:40px;font:inherit;color:inherit}
+        #anko-boot .words{overflow:hidden;position:relative;height:40px}
+        #anko-boot .words::after{content:"";position:absolute;inset:0;background:linear-gradient(var(--bg-color) 10%,transparent 30%,transparent 70%,var(--bg-color) 90%);z-index:20}
+        #anko-boot .word{display:block;height:40px;line-height:40px;margin:0;padding-left:6px;font:inherit;color:var(--accent,#956afa);transform:translateY(calc(var(--step,0) * -100%));transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+        @media (prefers-reduced-motion:reduce){#anko-boot .word{transition:none}}
+    </style>
+    <script>
+        (function() {
+            var root = document.documentElement;
+            var cacheKey = 'anko-ui-cached';
+            var cacheVersion = '13.11-01.12';
+            var cached = false;
+            try { cached = localStorage.getItem(cacheKey) === cacheVersion; } catch (e) {}
+            if (cached) root.classList.add('anko-boot-skip');
+            var steps = ['styles', 'fonts', 'icons', 'theme', 'effects', 'ready'];
+            var done = {};
+            var domReady = false;
+            var afterDomReady = false;
+            var finished = false;
+            var started = Date.now();
+            var shownStep = -1;
+            document.addEventListener('DOMContentLoaded', function() {
+                domReady = true;
+                setTimeout(function() { afterDomReady = true; }, 0);
+            });
+            if (document.fonts) document.fonts.ready.then(function() { done.fonts = true; });
+            else done.fonts = true;
+            function check() {
+                if (!done.styles) {
+                    var sheet = document.querySelector('link[href^="/0/01.css"]');
+                    done.styles = domReady || !!(sheet && sheet.sheet);
+                }
+                if (!done.icons && domReady) {
+                    var icons = document.querySelectorAll('img[src*="icons/"]');
+                    done.icons = Array.prototype.every.call(icons, function(img) { return img.complete; });
+                }
+                if (!done.theme && afterDomReady) done.theme = true;
+                if (!done.effects && afterDomReady) {
+                    var particlesOff = false;
+                    try { particlesOff = (localStorage.getItem('anko-particles') || 'on') !== 'on'; } catch (e) {}
+                    done.effects = particlesOff || !window.particlesJS || !!document.querySelector('#particles-js canvas');
+                }
+                var current = 0;
+                while (current < steps.length - 1 && done[steps[current]]) current++;
+                var boot = document.getElementById('anko-boot');
+                if (boot && current !== shownStep) {
+                    shownStep = current;
+                    boot.style.setProperty('--step', current);
+                }
+                if (cached && !finished && Date.now() - started > 600) root.classList.remove('anko-boot-skip');
+                if (current === steps.length - 1 || Date.now() - started > 4000) return finish(boot);
+                setTimeout(check, 40);
+            }
+            function finish(boot) {
+                if (finished) return;
+                finished = true;
+                try { localStorage.setItem(cacheKey, cacheVersion); } catch (e) {}
+                var hold = root.classList.contains('anko-boot-skip') ? 0 : 150;
+                setTimeout(function() {
+                    if (boot) boot.classList.add('done');
+                    root.classList.remove('anko-boot-skip');
+                    setTimeout(function() { if (boot && boot.parentNode) boot.parentNode.removeChild(boot); }, 300);
+                }, hold);
+            }
+            check();
+        })();
+    </script>
+    <script>
+        (function() {
+            if (!navigator.serviceWorker) return;
+            window._0xc93d0a = Promise.resolve();
+        })();
+    </script>
+    <script>
+        (function() {
+            try { Object.defineProperty(document, 'onclick', { set: function() {}, get: function() { return null; }, configurable: false }); } catch(e) {}
+            var _origAddEventListener = EventTarget.prototype.addEventListener;
+            EventTarget.prototype.addEventListener = function(type, fn, opts) {
+                _origAddEventListener.call(this, type, fn, opts);
+            };
+            document.addEventListener('click', function(e) {
+                var el = e.target;
+                while (el && el !== document) {
+                    if (el.tagName === 'A') {
+                        var href = el.getAttribute('href') || '';
+                        var target = el.getAttribute('target') || '';
+                        var isExternal = href.startsWith('http') && !href.startsWith(window.location.origin);
+                        var isNewTab = target === '_blank';
+                        var isWhitelisted = href.indexOf('discord.gg') !== -1;
+                        if (isExternal && isNewTab && !isWhitelisted) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            return;
+                        }
+                        var rect = el.getBoundingClientRect();
+                        var isOverlay = rect.width > window.innerWidth * 0.8 && rect.height > window.innerHeight * 0.8;
+                        if (isOverlay) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            return;
+                        }
+                    }
+                    el = el.parentElement;
+                }
+            }, true);
+        })();
+    </script>
+    
+    
+    
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/0/10.js?v=7"></script>
+    
+    <script defer src="/0/11.js"></script>
+    <title>anko</title>
+    <link rel="preload" href="/0/01.css?v=12" as="style">
+    <link rel="preload" href="/0/13.js?v=12" as="script">
+    <link rel="stylesheet" href="/0/01.css?v=12">
+    <link rel="stylesheet" href="/0/02.css">
+    <script>document.addEventListener("DOMContentLoaded",function(){var l=function(){var s=document.createElement("script");s.type="module";s.src="/0/12.js?v=4";document.body.appendChild(s)};("requestIdleCallback" in window)?requestIdleCallback(l,{timeout:3000}):setTimeout(l,1500)});</script>
+    <script>
+        (function(){var t=localStorage.getItem('anko-theme')||'sunset';var m={'aqua':'#00d4ff','bumblebee':'#ffcc00','lime':'#a3e635','sakura':'#ff8fab','nightshade':'#9b59b6','firey':'#ff5722','sunset':'#ff8551','white':'#ffffff','lightning':'#ffffff','cherry':'#ff4d4d','default':'#ff4d4d','red':'#ff4d4d'};var s={'aqua':'rgba(0,212,255,0.16)','bumblebee':'rgba(255,204,0,0.16)','lime':'rgba(163,230,53,0.16)','sakura':'rgba(255,143,171,0.16)','nightshade':'rgba(155,89,182,0.16)','firey':'rgba(255,87,34,0.16)','sunset':'rgba(255,133,81,0.16)','white':'rgba(255,255,255,0.16)','lightning':'rgba(255,255,255,0.16)','cherry':'rgba(255,77,77,0.16)'};var c=m[t]||'#ff4d4d';var o=s[t]||'rgba(255,77,77,0.16)';document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-soft',o);if(t==='sunset'){document.documentElement.style.setProperty('--bg-dark','#171119');}})();
+    </script>
+    <script defer src="/0/19.js?v=3"></script>
+</head>
+<body data-auth-prompt>
+    <div id="anko-boot" role="status" aria-live="polite">
+        <div class="card">
+            <div class="loader">
+                <p>loading</p>
+                <div class="words">
+                    <span class="word">styles</span>
+                    <span class="word">fonts</span>
+                    <span class="word">icons</span>
+                    <span class="word">theme</span>
+                    <span class="word">effects</span>
+                    <span class="word">ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="flex">
+        <div class="home-brand">
+            <img class="home-brand-logo" src="/img/anko-sunset-no-text-184.webp" width="184" height="184" fetchpriority="high" decoding="async" alt="">
+            <h1>anko</h1>
+        </div>
+        <div class="search-container">
+            <span class="material-symbols-outlined main-search-icon" aria-hidden="true">search</span>
+            <input type="text" id="mainSearch" placeholder="search web or enter url..." autocomplete="off">
+        </div>
+        <a href="https://discord.gg/anko" id="discord-box" target="_blank" rel="noopener noreferrer">
+            <img src="/icons/discord.webp" alt="">
+            <span>join our discord</span>
+        </a>
+        <div class="ad-slot ad-leaderboard">
+            <iframe data-removed-ad width="728" height="90" scrolling="no" title="advertisement" style="border:0;display:block;max-width:100%;margin:0 auto"></iframe>
+        </div>
+    </div>
+
+    <nav class="bottom-nav" aria-label="primary navigation">
+        <a href="/" class="nav-item" aria-label="home">
+            <img src="icons/01.svg" decoding="async" alt="home">
+        </a>
+        <a href="/g" class="nav-item" aria-label="games">
+            <img src="icons/02.svg" decoding="async" alt="games">
+        </a>
+        <a href="/v#shuttletv.su" class="nav-item" aria-label="movies">
+            <img src="icons/03.svg" decoding="async" alt="movies">
+        </a>
+        <a href="/ap" class="nav-item" aria-label="apps">
+            <img src="icons/04.svg" decoding="async" alt="apps">
+        </a>
+        <a href="/s" class="nav-item" aria-label="settings">
+            <img src="icons/05.svg" decoding="async" alt="settings">
+        </a>
+        <button type="button" class="nav-item" id="menuToggle" aria-label="more" title="more">
+            <img src="icons/06.svg" decoding="async" alt="more">
+        </button>
+    </nav>
+
+<div class="pullout-menu" id="pulloutMenu" aria-hidden="true">
+        <a href="/c" class="pullout-item" data-anko-chat-link aria-label="global chat" title="global chat"><img src="/icons/07.svg" decoding="async" alt="global chat"></a>
+        <a href="/a" class="pullout-item" aria-label="assistant">
+            <svg class="anko-nav-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 -960 960 960" fill="#fff" aria-hidden="true" focusable="false"><path d="M160-360q-50 0-85-35t-35-85q0-50 35-85t85-35v-80q0-33 23.5-56.5T240-760h120q0-50 35-85t85-35q50 0 85 35t35 85h120q33 0 56.5 23.5T800-680v80q50 0 85 35t35 85q0 50-35 85t-85 35v160q0 33-23.5 56.5T720-120H240q-33 0-56.5-23.5T160-200v-160Zm200-80q25 0 42.5-17.5T420-500q0-25-17.5-42.5T360-560q-25 0-42.5 17.5T300-500q0 25 17.5 42.5T360-440Zm240 0q25 0 42.5-17.5T660-500q0-25-17.5-42.5T600-560q-25 0-42.5 17.5T540-500q0 25 17.5 42.5T600-440ZM320-280h320v-80H320v80Z"/></svg>
+        </a>
+        <a href="/m" class="pullout-item" aria-label="music"><img src="icons/08.svg" decoding="async" alt="music"></a>
+        <a href="/cr" class="pullout-item" aria-label="credits">
+            <img src="icons/09.svg" decoding="async" alt="credits">
+        </a>
+        <a href="/t" class="pullout-item" aria-label="privacy &amp; terms">
+            <svg class="anko-nav-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 -960 960 960" fill="#fff" aria-hidden="true" focusable="false"><path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 63-16.5 122.5T736-280L618-398q11-19 16.5-39.5T640-480q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47q21 0 41.5-5.5T560-342l129 128q-42 49-94.5 84T480-80Zm0-320q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Z"/></svg>
+        </a>
+        <a href="https://discord.gg/anko" class="pullout-item" aria-label="discord" target="_blank" rel="noopener noreferrer">
+            <img src="icons/discord.webp" decoding="async" alt="discord">
+        </a>
+    </div>
+
+    <div id="particles-js"></div>
+
+    <script>
+        (function() {
+            const savedCloak = localStorage.getItem('anko-cloak') || 'google';
+            const savedTheme = localStorage.getItem('anko-theme') || 'sunset';
+
+            if (savedTheme === 'nightshade') {
+                document.documentElement.style.setProperty('--accent', '#9b59b6');
+                document.documentElement.style.setProperty('--accent-hover', '#8e44ad');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(155, 89, 182, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#b77fd4');
+                document.documentElement.style.setProperty('--accent-lighter', '#b77fd4');
+                document.documentElement.style.setProperty('--hue-rotate', '280deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(155, 89, 182, 0.12)');
+            } else if (savedTheme === 'aqua') {
+                document.documentElement.style.setProperty('--accent', '#00d4ff');
+                document.documentElement.style.setProperty('--accent-hover', '#00b8e0');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(0, 212, 255, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#5ee6ff');
+                document.documentElement.style.setProperty('--accent-lighter', '#5ee6ff');
+                document.documentElement.style.setProperty('--hue-rotate', '180deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(0, 212, 255, 0.12)');
+            } else if (savedTheme === 'bumblebee') {
+                document.documentElement.style.setProperty('--accent', '#ffcc00');
+                document.documentElement.style.setProperty('--accent-hover', '#e6b800');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(255, 204, 0, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#ffe45e');
+                document.documentElement.style.setProperty('--accent-lighter', '#ffe45e');
+                document.documentElement.style.setProperty('--hue-rotate', '45deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(255, 204, 0, 0.12)');
+            } else if (savedTheme === 'lime') {
+                document.documentElement.style.setProperty('--accent', '#a3e635');
+                document.documentElement.style.setProperty('--accent-hover', '#8cc928');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(163, 230, 53, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#c4f466');
+                document.documentElement.style.setProperty('--accent-lighter', '#c4f466');
+                document.documentElement.style.setProperty('--hue-rotate', '75deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(163, 230, 53, 0.12)');
+            } else if (savedTheme === 'sakura') {
+                document.documentElement.style.setProperty('--accent', '#ff8fab');
+                document.documentElement.style.setProperty('--accent-hover', '#f06a96');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(255, 143, 171, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#ffb9c9');
+                document.documentElement.style.setProperty('--accent-lighter', '#ffb9c9');
+                document.documentElement.style.setProperty('--hue-rotate', '330deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(255, 143, 171, 0.12)');
+            } else if (savedTheme === 'firey') {
+                document.documentElement.style.setProperty('--accent', '#ff5722');
+                document.documentElement.style.setProperty('--accent-hover', '#e64a19');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(255, 87, 34, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#ff8a50');
+                document.documentElement.style.setProperty('--accent-lighter', '#ff8a50');
+                document.documentElement.style.setProperty('--hue-rotate', '20deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(255, 87, 34, 0.12)');
+            } else if (savedTheme === 'lightning' || savedTheme === 'white') {
+                document.documentElement.style.setProperty('--accent', '#ffffff');
+                document.documentElement.style.setProperty('--accent-hover', '#ffffff');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(255, 255, 255, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#ffffff');
+                document.documentElement.style.setProperty('--accent-lighter', '#ffffff');
+                document.documentElement.style.setProperty('--hue-rotate', '335deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(255, 255, 255, 0.12)');
+            } else if (savedTheme === 'sunset') {
+                document.documentElement.style.setProperty('--accent', '#ff8551');
+                document.documentElement.style.setProperty('--accent-hover', '#ed7040');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(255, 133, 81, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#ffb083');
+                document.documentElement.style.setProperty('--accent-lighter', '#ffd0ae');
+                document.documentElement.style.setProperty('--logo-gradient', 'linear-gradient(90deg, #ffffff 0%, #ffffff 24%, #ffd9b8 32%, #ffab77 40%, #f08a72 47%, #d17f9c 54%, #a586c4 62%, #ffffff 74%, #ffffff 100%)');
+                document.documentElement.style.setProperty('--hue-rotate', '18deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(255, 133, 81, 0.12)');
+                document.documentElement.style.setProperty('--bg-dark', '#171119');
+            } else {
+                document.documentElement.style.setProperty('--accent', '#ff4d4d');
+                document.documentElement.style.setProperty('--accent-hover', '#ff3333');
+                document.documentElement.style.setProperty('--accent-soft', 'rgba(255, 77, 77, 0.16)');
+                document.documentElement.style.setProperty('--accent-light', '#ff8888');
+                document.documentElement.style.setProperty('--accent-lighter', '#ff8888');
+                document.documentElement.style.setProperty('--hue-rotate', '0deg');
+                document.documentElement.style.setProperty('--nav-hover', 'rgba(255, 77, 77, 0.12)');
+            }
+
+            const cloaks = {
+                'google': {
+                    title: 'Google',
+                    favicon: 'https://www.google.com/favicon.ico'
+                },
+                'wikipedia': {
+                    title: 'Wikipedia',
+                    favicon: 'https://www.wikipedia.org/static/favicon/wikipedia.ico'
+                },
+                'quizlet': {
+                    title: 'Your Sets | Quizlet',
+                    favicon: 'https://quizlet.com/favicon.ico'
+                },
+                'none': {
+                    title: 'anko',
+                    favicon: '/icons/ankoicon.png'
+                }
+            };
+
+            const selected = cloaks[savedCloak] || cloaks['google'];
+
+            let tdoc = document;
+            try {
+                if (window.top && window.top !== window && window.top.location.origin === location.origin) {
+                    tdoc = window.top.document;
+                }
+            } catch (e) {}
+
+            try { tdoc.title = selected.title; } catch (e) {}
+
+            if (selected.favicon) {
+                try {
+                    let link = tdoc.querySelector("link[rel*='icon']") || tdoc.createElement('link');
+                    link.type = selected.favicon === '/icons/ankoicon.png' ? 'image/png' : 'image/x-icon';
+                    link.rel = 'shortcut icon';
+                    link.href = selected.favicon;
+                    if (!tdoc.querySelector("link[rel*='icon']")) {
+                        const head = tdoc.head || tdoc.documentElement || tdoc;
+                        (head.appendChild || head.insertBefore).call(head, link, head.firstChild || null);
+                    }
+                } catch (e) {}
+            }
+        })();
+    </script>
+
+    <script src="particles.min.js" defer></script>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const savedParticles = localStorage.getItem('anko-particles') || 'on';
+                if (!window.particlesJS || savedParticles !== 'on') return;
+                const el = document.getElementById('particles-js');
+                if (!el) return;
+                const old = el.querySelector('canvas');
+                if (old) old.remove();
+                const particleColor = getParticleColor();
+                particlesJS('particles-js', {
+                    particles: {
+                        number: { value: 120, density: { enable: true, value_area: 800 } },
+                        color: { value: particleColor },
+                        shape: { type: 'circle' },
+                        opacity: { value: 0.8, random: true, anim: { enable: false } },
+                        size: { value: 3, random: true, anim: { enable: false } },
+                        line_linked: { enable: false },
+                        move: { enable: true, speed: getParticleSpeed(), direction: getParticleDirection(), random: false, straight: false, out_mode: 'out', bounce: false }
+                    },
+                    interactivity: {
+                        detect_on: 'canvas',
+                        events: { onhover: { enable: false }, onclick: { enable: false } }
+                    },
+                    retina_detect: true
+                });
+                applyParticleGlow(particleColor);
+            } catch (e) {}
+        });
+    </script>
+    <script src="/proxy-prewarm.js?v=8" defer></script>
+    <script src="/0/13.js?v=12" defer></script>
+    <script src="/0/17.js?v=1" defer></script>
+    <script src="/0/22.js?v=2" defer></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rooms — private first-person hangouts</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚪</text></svg>" />
+  <script type="module" crossorigin src="./assets/index-269AxiK7.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CU4ZPKC8.css">
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <!-- Crosshair -->
+  <div id="crosshair" class="hidden"><div></div></div>
+  <div id="interact-prompt" class="hidden">Press <b>E</b> to use the computer</div>
+
+  <!-- ============ LOBBY ============ -->
+  <div id="lobby">
+    <div class="lobby-card">
+      <div class="logo">🚪 Rooms</div>
+      <p class="tagline">Private first-person rooms. Meet online, walk around &amp; talk.</p>
+
+      <label class="field"><span>Your name</span>
+        <input id="name-input" maxlength="16" placeholder="e.g. Nova" autocomplete="off" />
+      </label>
+
+      <div class="row">
+        <label class="field grow"><span>Room code</span>
+          <input id="room-input" maxlength="12" placeholder="e.g. moon-den" autocomplete="off" spellcheck="false" />
+        </label>
+        <button id="random-room" title="Generate a random code">🎲</button>
+      </div>
+
+      <div class="field"><span>Avatar color</span>
+        <div id="avatar-colors"></div>
+      </div>
+
+      <div class="field"><span>Choose a map</span>
+        <div id="map-list"></div>
+      </div>
+
+      <div class="row btns">
+        <button id="join-btn" class="primary">Enter room →</button>
+      </div>
+      <p class="hint">
+        WASD move · Mouse look (click to lock) · Space jump · Shift sprint ·
+        <b>E</b> use computer · <b>T</b> chat · <b>M</b> mute
+      </p>
+      <p class="hint small">Multiplayer is peer-to-peer (no account). Share your room code with friends so they join the same private room. Voice + positions sync directly between browsers.</p>
+    </div>
+  </div>
+
+  <!-- ============ HUD ============ -->
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div class="pill" id="room-pill" title="Click to copy invite">🚪 <b id="hud-room">—</b> <small id="hud-map">—</small> <em id="copy-hint">copy invite</em></div>
+      <div class="pill" id="peer-pill">👥 <b id="peer-count">1</b> here</div>
+      <div class="pill clickable" id="mute-pill" title="Toggle voice (M)">🎙️ <b id="mute-label">Voice on</b></div>
+      <div class="pill clickable" id="maps-pill" title="Change map">🗺️ <b>Maps</b></div>
+      <div class="pill clickable" id="help-pill" title="Help">❓</div>
+      <div class="pill clickable danger" id="leave-pill" title="Leave room">⏻</div>
+    </div>
+    <div id="toast-holder"></div>
+    <div id="chat-log"></div>
+    <div id="chat-box" class="hidden">
+      <input id="chat-input" maxlength="200" placeholder="Say something… (Enter to send, Esc to close)" autocomplete="off" />
+    </div>
+    <div id="lock-tip">Click to look around · WASD to walk · E to use the computer</div>
+    <div id="speaking"></div>
+  </div>
+
+  <!-- Map switcher -->
+  <div id="map-modal" class="hidden">
+    <div class="modal-card">
+      <h3>🗺️ Choose map <small>(switches everyone in the room)</small></h3>
+      <div id="map-list-ingame"></div>
+      <button id="map-close" class="ghost">Close</button>
+    </div>
+  </div>
+
+  <!-- Help -->
+  <div id="help-modal" class="hidden">
+    <div class="modal-card">
+      <h3>❓ How to play</h3>
+      <ul>
+        <li><b>Click the game</b> to lock the mouse, then look around.</li>
+        <li><b>WASD / arrows</b> move, <b>Space</b> jump, <b>Shift</b> sprint.</li>
+        <li>Walk to the <b>desk by the bed</b> and press <b>E</b> — the PC opens a working web browser (starts on the built-in start page).</li>
+        <li><b>T</b> or <b>Enter</b> opens text chat. <b>M</b> mutes your mic.</li>
+        <li>Share the <b>room code</b> (click it to copy) — anyone with the code joins your private room.</li>
+        <li>Voice chat starts when you allow the microphone. Peers hear you room-wide.</li>
+      </ul>
+      <button id="help-close" class="ghost">Close</button>
+    </div>
+  </div>
+
+  <!-- ============ DESKTOP OS OVERLAY ============ -->
+  <div id="os" class="hidden">
+    <div id="os-window">
+      <div id="os-titlebar">
+        <div class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <div id="os-title">🖥️ desk-pc — Browser</div>
+        <button id="os-close" title="Stand up (Esc)">✕ Stand up</button>
+      </div>
+      <div id="browser-bar">
+        <button id="bb-back" title="Back">←</button>
+        <button id="bb-fwd" title="Forward">→</button>
+        <button id="bb-reload" title="Reload">⟳</button>
+        <button id="bb-home" title="Home page">⌂</button>
+        <input id="browser-url" spellcheck="false" autocomplete="off" />
+        <button id="bb-go">Go</button>
+        <button id="bb-proxy" title="If a site refuses to embed, reload it through the proxy">🛡️ proxy</button>
+        <button id="bb-tab" title="Open in a real browser tab">↗ tab</button>
+      </div>
+      <div id="browser-note" class="hidden"></div>
+      <iframe id="browser-frame" title="desktop browser" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="fullscreen"></iframe>
+      <div id="os-taskbar">
+        <span class="os-app active">🌐 Browser</span>
+        <span class="os-app" id="os-notes-app">📝 Notes</span>
+        <span class="os-app" id="os-help-app">❓ Help</span>
+        <span id="os-clock"></span>
+      </div>
+      <div id="os-notes" class="hidden">
+        <h4>📝 sticky notes</h4>
+        <p>Welcome to your desk! This PC lives right by your bed.</p>
+        <p>• The browser starts on the room's homepage.<br/>• Some sites block embedding — use <b>🛡️ proxy</b> or <b>↗ tab</b>.<br/>• Press <b>Esc</b> or <b>Stand up</b> to go back to first-person.</p>
+        <textarea id="notes-text" placeholder="type your own notes here…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div id="fatal" class="hidden"></div>
+
+</body>
+</html>
