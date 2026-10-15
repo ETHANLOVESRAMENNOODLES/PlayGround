@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232b241c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%23c9a227' font-family='serif' font-weight='bold'%3ET%3C/text%3E%3C/svg%3E"/>
+<title>In The Trenches — WW1 FPS Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Special+Elite&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<!-- vignette / grain / damage overlays -->
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="damage-flash"></div>
+<div id="heal-flash"></div>
+<div id="letterbox-top"></div>
+<div id="letterbox-bot"></div>
+
+<!-- ============ MAIN MENU ============ -->
+<div id="menu" class="screen visible">
+  <div class="menu-bg"></div>
+  <div class="menu-inner">
+    <div class="kicker">WESTERN FRONT · 1916 · SOMME SECTOR</div>
+    <h1 class="title">IN THE<br><span>TRENCHES</span></h1>
+    <div class="subtitle">A World War I first-person shooter prototype — single-player offensive against AI battalions</div>
+    <div class="menu-buttons">
+      <button id="btn-single" class="mbtn primary"><span class="mbtn-top">SINGLE PLAYER</span><span class="mbtn-sub">6 vs 6 · Capture the farmhouse ruin</span></button>
+      <button id="btn-multi" class="mbtn disabled" disabled><span class="mbtn-top">MULTIPLAYER — COMING SOON</span><span class="mbtn-sub">Online play is not implemented in this prototype</span></button>
+      <button id="btn-settings" class="mbtn"><span class="mbtn-top">SETTINGS</span></button>
+      <button id="btn-quit" class="mbtn"><span class="mbtn-top">QUIT</span></button>
+    </div>
+    <div class="menu-foot">
+      <div><strong>WASD</strong> move · <strong>Mouse</strong> aim · <strong>LMB</strong> fire · <strong>RMB</strong> aim · <strong>R</strong> reload · <strong>1/2</strong> weapons · <strong>Shift</strong> sprint · <strong>C</strong> crouch</div>
+      <div class="esrb">18+ · Historical prototype · Headphones recommended</div>
+    </div>
+  </div>
+  <div class="menu-side">
+    <div class="dispatch">
+      <h3>FIELD DISPATCH Nº 47</h3>
+      <p>Zero hour approaches. Our company holds the southern trench. The ruined farmhouse in No-Man's-Land commands the sector — <em>take it and hold it</em>.</p>
+      <p>The Hun holds the northern line in strength. Expect bolt rifles, patrols and shellfire. Stay low, use the craters, and watch your section's markers: <span class="blue">blue — our boys</span>, <span class="red">red — the enemy</span>.</p>
+      <div class="stamp">APPROVED · GHQ</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<div id="settings" class="screen">
+  <div class="panel">
+    <h2>SETTINGS</h2>
+    <label>Mouse sensitivity <span id="sens-val">1.00</span><input id="set-sens" type="range" min="0.2" max="3" step="0.05" value="1"></label>
+    <label>Aim (ADS) sensitivity <span id="ads-val">0.70</span><input id="set-ads" type="range" min="0.2" max="2" step="0.05" value="0.7"></label>
+    <label>Master volume <span id="vol-val">70%</span><input id="set-vol" type="range" min="0" max="100" step="1" value="70"></label>
+    <label class="row"><input id="set-invert" type="checkbox"> Invert Y axis</label>
+    <label class="row"><input id="set-shake" type="checkbox" checked> Screen shake &amp; shell shock</label>
+    <label>Quality
+      <select id="set-quality"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select>
+    </label>
+    <div class="panel-btns"><button id="btn-settings-back" class="mbtn small primary"><span class="mbtn-top">BACK</span></button></div>
+  </div>
+</div>
+
+<!-- ============ DEPLOY / BRIEFING ============ -->
+<div id="deploy" class="screen">
+  <div class="panel wide">
+    <div class="kicker">ORDERS — OPERATION THISTLE</div>
+    <h2>CAPTURE THE FARMHOUSE</h2>
+    <div class="deploy-grid">
+      <div>
+        <p>Stand inside the <strong>white-taped ruin</strong> at the centre of No-Man's-Land to raise our flag. Hold it: your company gains <strong>victory points</strong> every second while you hold. Kills also score. First to <strong>500</strong> — or the higher score when the whistle blows (12 min) — takes the sector.</p>
+        <ul class="loadout">
+          <li><strong>SMLE Mk III</strong> — bolt-action rifle · 5-round magazine · bayonet spirit included</li>
+          <li><strong>Webley Mk VI</strong> — service revolver · 6 rounds · sidearm (press 2)</li>
+          <li>Ammo crates in both trenches resupply on touch. Wounds heal if you stay out of fire.</li>
+        </ul>
+        <div class="panel-btns">
+          <button id="btn-deploy" class="mbtn primary"><span class="mbtn-top">GO OVER THE TOP →</span></button>
+          <button id="btn-deploy-back" class="mbtn small"><span class="mbtn-top">MENU</span></button>
+        </div>
+      </div>
+      <div class="tacmap"><canvas id="tacmap" width="300" height="300"></canvas><div class="tac-cap">SECTOR MAP — SOUTH (US) AT BOTTOM</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAUSE ============ -->
+<div id="pause" class="screen">
+  <div class="panel">
+    <h2>PAUSED — BREATHER IN THE DUGOUT</h2>
+    <p class="dim">Pointer released. Click resume to return to the line.</p>
+    <div class="menu-buttons">
+      <button id="btn-resume" class="mbtn primary"><span class="mbtn-top">RESUME</span></button>
+      <button id="btn-restart" class="mbtn"><span class="mbtn-top">RESTART MATCH</span></button>
+      <button id="btn-quit-menu" class="mbtn"><span class="mbtn-top">QUIT TO MENU</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MATCH END ============ -->
+<div id="gameover" class="screen">
+  <div class="panel wide center">
+    <div class="kicker" id="go-kicker">BATTLE RESULT</div>
+    <h2 id="go-title">SECTOR TAKEN</h2>
+    <p id="go-detail" class="dim"></p>
+    <div id="go-stats" class="stats"></div>
+    <div class="panel-btns">
+      <button id="btn-again" class="mbtn primary"><span class="mbtn-top">PLAY AGAIN</span></button>
+      <button id="btn-go-menu" class="mbtn"><span class="mbtn-top">MAIN MENU</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HUD ============ -->
+<div id="hud" class="hidden">
+  <div id="crosshair"><span class="c t"></span><span class="c b"></span><span class="c l"></span><span class="c r"></span><span class="cdot"></span></div>
+  <div id="hitmarker"><span></span><span></span><span></span><span></span></div>
+  <div id="hitdir"></div>
+  <div id="topbar">
+    <div class="team-score brit"><span class="flag">🇬🇧</span><span id="score-brit">0</span><div class="tbar"><i id="tbar-brit"></i></div></div>
+    <div id="objective-pill"><span id="obj-icon">◈</span><span id="obj-text">CAPTURE THE FARMHOUSE</span><div id="cap-wrap"><i id="cap-fill"></i></div></div>
+    <div class="team-score ger"><div class="tbar"><i id="tbar-ger"></i></div><span id="score-ger">0</span><span class="flag">🇩🇪</span></div>
+  </div>
+  <div id="timer">12:00</div>
+  <div id="compass"><div id="compass-strip"></div><div id="compass-needle">▲</div></div>
+  <div id="killfeed"></div>
+  <div id="hint"></div>
+  <div id="zone-banner" class="hidden">⚑ CAPTURING …</div>
+  <div id="bottomleft">
+    <div id="health"><div id="health-bar"><i></i></div><span id="health-num">100</span></div>
+    <div id="stance">STANDING</div>
+  </div>
+  <div id="bottomright">
+    <div id="weapon-name">SMLE Mk III</div>
+    <div id="ammo"><span id="ammo-mag">5</span><span id="ammo-res">/ 50</span></div>
+    <div id="slots"><span id="slot1" class="on">1 Rifle</span><span id="slot2">2 Revolver</span></div>
+  </div>
+  <canvas id="minimap" width="168" height="168"></canvas>
+  <div id="killmsg"></div>
+  <div id="reload-ring" class="hidden">RELOADING</div>
+</div>
+
+<div id="toast" class="hidden"></div>
+<div id="click-to-play" class="hidden">CLICK TO AIM — pointer locked when playing</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
